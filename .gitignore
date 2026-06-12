@@ -29,3 +29,6 @@ MANIFEST
 
 # Jupyter Notebooks checkpoints
 .ipynb_checkpoints
+
+# Compiled Executables
+*.exe
