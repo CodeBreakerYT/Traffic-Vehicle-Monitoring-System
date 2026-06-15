@@ -4,17 +4,22 @@ import struct
 import time
 import threading
 
+# Shared thread-safe state for single-thread camera capture
+shared_frame = None
+shared_frame_lock = threading.Lock()
+
 def get_local_ips():
     """Returns a list of all IP addresses associated with the local machine."""
     ips = []
     try:
         hostname = socket.gethostname()
-        ips = socket.gethostbyname_ex(hostname)[2]
+        for info in socket.getaddrinfo(hostname, None):
+            ip = info[4][0]
+            # Filter for IPv4 and non-loopback
+            if "." in ip and not ip.startswith("127.") and ip not in ips:
+                ips.append(ip)
     except Exception:
         pass
-    
-    # Filter list
-    ips = [ip for ip in ips if not ip.startswith("127.")]
     
     # Proactively fetch primary interface IP using UDP socket trick
     try:
@@ -22,33 +27,47 @@ def get_local_ips():
         s.connect(("8.8.8.8", 80))
         primary_ip = s.getsockname()[0]
         s.close()
-        if primary_ip not in ips and primary_ip != "127.0.0.1":
+        if primary_ip not in ips and not primary_ip.startswith("127."):
             ips.insert(0, primary_ip)
     except Exception:
         pass
+
+    # Local subnet fallback check
+    if not ips:
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(("192.168.1.255", 9))
+            primary_ip = s.getsockname()[0]
+            s.close()
+            if primary_ip not in ips and not primary_ip.startswith("127."):
+                ips.append(primary_ip)
+        except Exception:
+            pass
 
     if not ips:
         ips = ["127.0.0.1"]
     return ips
 
-def client_handler(conn, addr, cap, lock, shutdown_event):
+def client_handler(conn, addr, shutdown_event):
     print(f"\n[CONNECTION] Live connection established with client: {addr[0]}:{addr[1]}")
     conn.settimeout(3.0) # 3-second timeout for socket operations
     
     try:
         while not shutdown_event.is_set():
-            # Thread-safe camera read
-            with lock:
-                ret, frame = cap.read()
+            # Thread-safe read from the shared frame
+            frame_to_send = None
+            with shared_frame_lock:
+                if shared_frame is not None:
+                    frame_to_send = shared_frame.copy()
             
-            if not ret:
+            if frame_to_send is None:
                 time.sleep(0.03)
                 continue
-            
+                
             # Compress to JPEG
             # Quality 75 provides a great balance between quality and bandwidth
             encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 75]
-            result, encoded_frame = cv2.imencode('.jpg', frame, encode_param)
+            result, encoded_frame = cv2.imencode('.jpg', frame_to_send, encode_param)
             if not result:
                 continue
                 
@@ -76,6 +95,7 @@ def client_handler(conn, addr, cap, lock, shutdown_event):
         print(f"[STATUS] Connection closed. Awaiting new connections...")
 
 def main():
+    global shared_frame
     print("=========================================================")
     print("          CYBERNETIC CAMERA STREAMING SERVER (CAM.EXE)   ")
     print("=========================================================")
@@ -86,6 +106,10 @@ def main():
     print("Recommended IP address(es) to enter in your Monitoring client:")
     for ip in local_ips:
         print(f"  ->  {ip}")
+        
+    print("\n[IMPORTANT] Firewall configuration:")
+    print("  If connecting across laptops fails, ensure Windows Firewall on this machine")
+    print("  allows 'cam.exe' or the selected port through (Private network recommended).")
     
     # Configure Port
     port_input = input("\nEnter stream port [Default: 5000]: ").strip()
@@ -113,7 +137,7 @@ def main():
     try:
         server_socket.bind(("0.0.0.0", port))
         server_socket.listen(1)
-        server_socket.settimeout(1.0) # 1-second timeout to check for program exit loop
+        server_socket.settimeout(0.01) # 10ms timeout to keep preview rendering smooth
     except Exception as e:
         print(f"[CRITICAL] Failed to bind to port {port}: {e}")
         cap.release()
@@ -124,7 +148,6 @@ def main():
     print("Press 'q' in the Preview window or Ctrl+C in console to terminate.")
     
     shutdown_event = threading.Event()
-    cam_lock = threading.Lock()
     client_thread = None
     
     # Local Preview Window flag
@@ -132,22 +155,34 @@ def main():
     
     try:
         while True:
-            # Handle local preview rendering
-            if show_preview:
-                with cam_lock:
-                    ret, frame = cap.read()
-                if ret:
-                    # Draw server info on preview frame for clarity
-                    cv2.putText(frame, f"Server IP: {local_ips[0]}:{port}", (15, 30), 
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-                    cv2.putText(frame, "STREAM ACTIVE - Press 'Q' to Exit", (15, 60), 
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
-                    cv2.imshow("cam.exe - Local Camera Feed", frame)
+            # Capture frame exactly once per iteration for both preview and streaming
+            ret, frame = cap.read()
+            if ret:
+                with shared_frame_lock:
+                    shared_frame = frame.copy()
+                    
+            # Handle local preview rendering using the captured frame
+            if show_preview and ret:
+                preview_frame = frame.copy()
+                # Draw server info on preview frame for clarity
+                cv2.putText(preview_frame, f"Server IP: {local_ips[0]}:{port}", (15, 30), 
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+                cv2.putText(preview_frame, "STREAM ACTIVE - Press 'Q' to Exit", (15, 60), 
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
+                try:
+                    cv2.imshow("cam.exe - Local Camera Feed", preview_frame)
+                except Exception as e:
+                    print(f"[WARNING] Local GUI preview window failed to open/render: {e}")
+                    show_preview = False
                 
-                # Check for exit key in OpenCV Window
+            # Check for exit key in OpenCV Window
+            if show_preview:
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     print("\n[EXIT] Terminated by local user action.")
                     break
+            else:
+                # Sleep a bit to match the ~30 FPS frame capture rate when preview is disabled
+                time.sleep(0.03)
                     
             # Accept connections
             try:
@@ -161,13 +196,13 @@ def main():
                     
                 client_thread = threading.Thread(
                     target=client_handler, 
-                    args=(conn, addr, cap, cam_lock, shutdown_event),
+                    args=(conn, addr, shutdown_event),
                     daemon=True
                 )
                 client_thread.start()
                 
             except socket.timeout:
-                # Regular timeout to keep main thread active and responsive to interrupts
+                # Regular timeout to keep main thread active and responsive
                 continue
                 
     except KeyboardInterrupt:
@@ -184,9 +219,13 @@ def main():
             pass
             
         cap.release()
-        cv2.destroyAllWindows()
+        try:
+            cv2.destroyAllWindows()
+        except Exception:
+            pass
         print("[STATUS] Offline. System Safe.")
         time.sleep(1)
 
 if __name__ == "__main__":
     main()
+

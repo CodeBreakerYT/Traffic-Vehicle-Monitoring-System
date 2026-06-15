@@ -2,6 +2,6 @@
     "carla_path": "F:\\pluginFiles\\simulation\\CARLA_0.9.16",
     "grid_enabled": true,
     "scanlines_enabled": false,
-    "camera_ip": "127.0.0.1",
+    "camera_ip": "192.168.1.2",
     "camera_port": 5000
 }

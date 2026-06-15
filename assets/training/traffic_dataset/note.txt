@@ -1,0 +1,5 @@
+training dataset link:
+
+1. https://www.kaggle.com/datasets/unidpro/real-time-traffic-video-dataset/
+2. https://www.kaggle.com/datasets/suryaprabhakaran2005/road-accidents-from-cctv-footages-dataset/
+
