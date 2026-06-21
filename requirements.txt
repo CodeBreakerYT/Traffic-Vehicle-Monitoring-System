@@ -1,0 +1,31 @@
+# Traffic & Vehicle Monitoring System — Python dependencies
+# Install with: pip install -r requirements.txt
+# (use the project's venv: venv/Scripts/python.exe -m pip install -r requirements.txt)
+
+# ── Core app (UI, video, arrays) ──────────────────────────────────────────────
+pygame==2.6.1
+opencv-python==4.13.0.92
+numpy==2.4.6
+Pillow==12.2.0
+
+# ── Machine learning (detection, classification, training) ───────────────────
+ultralytics==8.4.67
+torch==2.12.0
+torchvision==0.27.0
+scipy==1.17.1
+
+# ── Data handling (severity score .xlsx parsing during training) ─────────────
+pandas==3.0.3
+openpyxl==3.1.5
+
+# ── CARLA simulation (Option 3) ───────────────────────────────────────────────
+# Must match the version of the CARLA server you have installed.
+# If `pip install carla==0.9.16` fails for your platform, install the wheel
+# bundled with your CARLA download instead, e.g.:
+#   pip install <CARLA_PATH>/PythonAPI/carla/dist/carla-0.9.16-*.whl
+carla==0.9.16
+
+# ── Packaging standalone .exe files (build_car.py / build_cam.py) ────────────
+# Only required if you intend to build the executables yourself; not needed
+# to just run the app via `python main.py`.
+pyinstaller==6.20.0
