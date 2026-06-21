@@ -1,0 +1,223 @@
+274 INFO: PyInstaller: 6.20.0, contrib hooks: 2026.6
+274 INFO: Python: 3.12.10
+294 INFO: Platform: Windows-11-10.0.26200-SP0
+294 INFO: Python environment: D:\Github\Traffic-Vehicle-Monitoring-System\venv
+297 INFO: wrote .\car.spec
+6559 INFO: Module search paths (PYTHONPATH):
+['D:\\Github\\Traffic-Vehicle-Monitoring-System',
+ 'C:\\Users\\Rishav\\AppData\\Local\\Python\\pythoncore-3.12-64\\python312.zip',
+ 'C:\\Users\\Rishav\\AppData\\Local\\Python\\pythoncore-3.12-64\\DLLs',
+ 'C:\\Users\\Rishav\\AppData\\Local\\Python\\pythoncore-3.12-64\\Lib',
+ 'C:\\Users\\Rishav\\AppData\\Local\\Python\\pythoncore-3.12-64',
+ 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv',
+ 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages',
+ 'D:\\Github\\Traffic-Vehicle-Monitoring-System']
+D:\Github\Traffic-Vehicle-Monitoring-System\venv\Lib\site-packages\pygame\pkgdata.py:25: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_stream, resource_exists
+pygame 2.6.1 (SDL 2.28.4, Python 3.12.10)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+6902 INFO: Appending 'datas' from .spec
+6911 INFO: checking Analysis
+7218 INFO: Building because D:\Github\Traffic-Vehicle-Monitoring-System\scripts\option_3\simulation_client.py changed
+7218 INFO: Looking for Python shared library...
+7219 INFO: Using Python shared library: C:\Users\Rishav\AppData\Local\Python\pythoncore-3.12-64\python312.dll
+7219 INFO: Running Analysis Analysis-00.toc
+7219 INFO: Target bytecode optimization level: 0
+7219 INFO: Initializing module dependency graph...
+7220 INFO: Initializing module graph hook caches...
+7260 INFO: Analyzing modules for base_library.zip ...
+7918 INFO: Processing standard module hook 'hook-heapq.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+7963 INFO: Processing standard module hook 'hook-encodings.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+8818 INFO: Processing standard module hook 'hook-pickle.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+9461 INFO: Caching module dependency graph...
+9483 INFO: Analyzing D:\Github\Traffic-Vehicle-Monitoring-System\main.py
+9532 INFO: Processing standard module hook 'hook-pygame.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\pygame\\__pyinstaller'
+D:\Github\Traffic-Vehicle-Monitoring-System\venv\Lib\site-packages\pygame\pkgdata.py:25: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_stream, resource_exists
+9727 INFO: Processing pre-safe-import-module hook 'hook-typing_extensions.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+9729 INFO: SetuptoolsInfo: initializing cached setuptools info...
+10186 INFO: Processing standard module hook 'hook-multiprocessing.util.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+10260 INFO: Processing standard module hook 'hook-xml.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+10373 INFO: Processing standard module hook 'hook-_ctypes.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+10690 INFO: Processing standard module hook 'hook-numpy.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+11271 INFO: Processing standard module hook 'hook-difflib.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+11595 INFO: Processing standard module hook 'hook-sysconfig.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+11646 INFO: Processing standard module hook 'hook-platform.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+11906 INFO: Processing standard module hook 'hook-psutil.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+13276 INFO: Processing standard module hook 'hook-charset_normalizer.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+13692 INFO: Processing standard module hook 'hook-pkg_resources.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+13875 INFO: Processing pre-safe-import-module hook 'hook-packaging.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+14043 INFO: Processing pre-safe-import-module hook 'hook-jaraco.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+14044 INFO: Setuptools: 'jaraco' appears to be a full setuptools-vendored copy - creating alias to 'setuptools._vendor.jaraco'!
+14052 INFO: Processing standard module hook 'hook-setuptools.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+14078 INFO: Processing pre-safe-import-module hook 'hook-distutils.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+14128 INFO: Processing pre-safe-import-module hook 'hook-jaraco.functools.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+14128 INFO: Setuptools: 'jaraco.functools' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.jaraco.functools'!
+14141 INFO: Processing pre-safe-import-module hook 'hook-more_itertools.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+14142 INFO: Setuptools: 'more_itertools' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.more_itertools'!
+14453 INFO: Processing pre-safe-import-module hook 'hook-jaraco.text.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+14454 INFO: Setuptools: 'jaraco.text' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.jaraco.text'!
+14464 INFO: Processing standard module hook 'hook-setuptools._vendor.jaraco.text.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+14466 INFO: Processing pre-safe-import-module hook 'hook-importlib_resources.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+14467 INFO: Processing pre-safe-import-module hook 'hook-jaraco.context.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+14467 INFO: Setuptools: 'jaraco.context' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.jaraco.context'!
+14476 INFO: Processing pre-safe-import-module hook 'hook-backports.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+14477 INFO: Setuptools: 'backports' appears to be a full setuptools-vendored copy - creating alias to 'setuptools._vendor.backports'!
+14652 INFO: Processing pre-safe-import-module hook 'hook-importlib_metadata.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+14653 INFO: Setuptools: 'importlib_metadata' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.importlib_metadata'!
+14670 INFO: Processing standard module hook 'hook-setuptools._vendor.importlib_metadata.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+14735 INFO: Processing pre-safe-import-module hook 'hook-zipp.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+14736 INFO: Setuptools: 'zipp' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.zipp'!
+15011 INFO: Processing pre-safe-import-module hook 'hook-tomli.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+15011 INFO: Setuptools: 'tomli' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.tomli'!
+15499 INFO: Processing pre-safe-import-module hook 'hook-wheel.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+15500 INFO: Setuptools: 'wheel' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.wheel'!
+15586 INFO: Processing pre-safe-import-module hook 'hook-platformdirs.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+15600 INFO: Processing standard module hook 'hook-platformdirs.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+15692 INFO: Processing pre-find-module-path hook 'hook-tkinter.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_find_module_path'
+15694 INFO: TclTkInfo: initializing cached Tcl/Tk info...
+15931 INFO: Processing standard module hook 'hook-_tkinter.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+15957 INFO: Processing standard module hook 'hook-cv2.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+16243 INFO: Processing standard module hook 'hook-scipy.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+16751 INFO: Processing standard module hook 'hook-pycparser.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+17263 INFO: Processing standard module hook 'hook-scipy.linalg.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+17442 INFO: Processing standard module hook 'hook-torch.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+1032 WARNING: Failed to collect submodules for 'torch.utils.tensorboard' because importing 'torch.utils.tensorboard' raised: ModuleNotFoundError: No module named 'tensorboard'
+D:\Github\Traffic-Vehicle-Monitoring-System\venv\Lib\site-packages\PyInstaller\utils\hooks\__init__.py:665: DeprecationWarning: `torch.distributed._sharding_spec` will be deprecated, use `torch.distributed._shard.sharding_spec` instead
+  __import__(name)
+D:\Github\Traffic-Vehicle-Monitoring-System\venv\Lib\site-packages\PyInstaller\utils\hooks\__init__.py:665: DeprecationWarning: `torch.distributed._sharded_tensor` will be deprecated, use `torch.distributed._shard.sharded_tensor` instead
+  __import__(name)
+D:\Github\Traffic-Vehicle-Monitoring-System\venv\Lib\site-packages\PyInstaller\utils\hooks\__init__.py:665: DeprecationWarning: `torch.distributed._shard.checkpoint` will be deprecated, use `torch.distributed.checkpoint` instead
+  __import__(name)
+24052 INFO: hook-torch: this torch build does not depend on MKL...
+25168 INFO: Processing standard module hook 'hook-matplotlib.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+25666 INFO: Processing standard module hook 'hook-matplotlib.backend_bases.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+25784 INFO: Processing standard module hook 'hook-PIL.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+25860 INFO: Processing standard module hook 'hook-PIL.Image.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+26122 INFO: Processing standard module hook 'hook-xml.etree.cElementTree.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+26170 INFO: Processing standard module hook 'hook-xml.dom.domreg.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+26430 INFO: Processing standard module hook 'hook-PIL.ImageFilter.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+27021 INFO: Processing standard module hook 'hook-jinja2.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+27565 INFO: Processing standard module hook 'hook-matplotlib.backends.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+27636 INFO: Processing standard module hook 'hook-matplotlib.pyplot.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+28285 INFO: Processing standard module hook 'hook-dateutil.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+28345 INFO: Processing pre-safe-import-module hook 'hook-six.moves.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+30305 INFO: Processing standard module hook 'hook-pandas.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+31964 INFO: Processing standard module hook 'hook-zoneinfo.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+33898 INFO: Processing standard module hook 'hook-scipy.spatial._ckdtree.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+44079 INFO: Processing standard module hook 'hook-scipy.special._ufuncs.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+44316 INFO: Processing standard module hook 'hook-scipy.special._ellip_harm_2.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+46853 INFO: Processing standard module hook 'hook-IPython.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+48216 INFO: Processing standard module hook 'hook-pygments.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+50413 INFO: Processing standard module hook 'hook-wcwidth.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+51652 INFO: Processing standard module hook 'hook-jedi.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+53469 INFO: Processing standard module hook 'hook-parso.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+55043 INFO: Processing standard module hook 'hook-sqlite3.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+55313 INFO: Processing standard module hook 'hook-nbformat.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+55656 INFO: Processing standard module hook 'hook-jsonschema.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+56146 INFO: Processing standard module hook 'hook-lark.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\lark\\__pyinstaller'
+56968 INFO: Processing standard module hook 'hook-jsonschema_specifications.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+57042 INFO: Processing standard module hook 'hook-urllib3.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+57548 INFO: Processing standard module hook 'hook-certifi.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+58681 INFO: Processing standard module hook 'hook-zmq.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+60370 INFO: Processing pre-safe-import-module hook 'hook-gi.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+60898 INFO: Processing pre-safe-import-module hook 'hook-win32com.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\pre_safe_import_module'
+65279 INFO: Processing standard module hook 'hook-torchvision.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+65315 INFO: Processing standard module hook 'hook-torchvision.io.image.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+66522 INFO: Processing standard module hook 'hook-scipy.io.matlab.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+75608 INFO: Processing standard module hook 'hook-fsspec.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+80996 INFO: Processing standard module hook 'hook-scipy.spatial.transform.rotation.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+81787 INFO: Processing standard module hook 'hook-scipy.stats._stats.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+82484 INFO: Processing standard module hook 'hook-scipy.sparse.csgraph.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+83835 INFO: Processing standard module hook 'hook-pandas.io.formats.style.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+85825 INFO: Processing standard module hook 'hook-pandas.plotting.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+87098 INFO: Processing standard module hook 'hook-openpyxl.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+89145 INFO: Processing standard module hook 'hook-pandas.io.clipboard.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+92964 INFO: Processing standard module hook 'hook-ultralytics.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+97023 INFO: Processing pre-safe-import-module hook 'hook-tensorflow.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\pre_safe_import_module'
+98756 INFO: Analyzing hidden import 'ultralytics.data.annotator'
+98768 INFO: Analyzing hidden import 'ultralytics.data.split_dota'
+98780 INFO: Analyzing hidden import 'ultralytics.hub.google'
+98788 INFO: Analyzing hidden import 'ultralytics.nn.modules.activation'
+98795 INFO: Processing module hooks (post-graph stage)...
+99168 WARNING: Hidden import "pycparser.lextab" not found!
+99168 WARNING: Hidden import "pycparser.yacctab" not found!
+104772 INFO: Processing standard module hook 'hook-matplotlib.backends.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+104772 INFO: Matplotlib backend selection method: automatic discovery of used backends
+104788 INFO: Discovered Matplotlib backend(s) via `matplotlib.use()` call in module 'sympy.testing.runtests': ['Agg', 'Agg']
+104799 INFO: The following Matplotlib backends were discovered by scanning for `matplotlib.use()` calls: ['Agg']. If your backend of choice is not in this list, either add a `matplotlib.use()` call to your code, or configure the backend collection via hook options (see: https://pyinstaller.org/en/stable/hooks-config.html#matplotlib-hooks).
+104799 INFO: Selected matplotlib backends: ['Agg']
+105454 INFO: Processing standard module hook 'hook-PIL.SpiderImagePlugin.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+109284 WARNING: Hidden import "scipy.special._cdflib" not found!
+109316 INFO: Processing standard module hook 'hook-_tkinter.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+109317 INFO: Processing standard module hook 'hook-tzdata.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+114953 INFO: Performing binary vs. data reclassification (7778 entries)
+119825 INFO: Looking for ctypes DLLs
+119910 WARNING: Ignoring /usr/lib64/libgomp.so.1 imported from D:\Github\Traffic-Vehicle-Monitoring-System\venv\Lib\site-packages\torch\_inductor\codecache.py - only basenames are supported with ctypes imports!
+120163 INFO: Analyzing run-time hooks ...
+120183 INFO: Including run-time hook 'pyi_rth_inspect.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+120195 INFO: Including run-time hook 'pyi_rth_setuptools.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+120204 INFO: Including run-time hook 'pyi_rth_pkgutil.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+120213 INFO: Including run-time hook 'pyi_rth_multiprocessing.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+120222 INFO: Including run-time hook 'pyi_rth_traitlets.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\rthooks'
+120229 INFO: Including run-time hook 'pyi_rth_mplconfig.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+120236 INFO: Processing pre-find-module-path hook 'hook-_pyi_rth_utils.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_find_module_path'
+120244 INFO: Processing standard module hook 'hook-_pyi_rth_utils.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+120267 INFO: Including run-time hook 'pyi_rth__tkinter.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+120272 INFO: Including run-time hook 'pyi_rth_pkgres.py' from 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+120499 INFO: Creating base_library.zip...
+120519 INFO: Looking for dynamic libraries
+D:\Github\Traffic-Vehicle-Monitoring-System\venv\Lib\site-packages\PyInstaller\building\build_main.py:227: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  __import__(package)
+0.00s - Debugger warning: It seems that frozen modules are being used, which may
+0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+0.00s - to python to disable frozen modules.
+0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+D:\Github\Traffic-Vehicle-Monitoring-System\venv\Lib\site-packages\PyInstaller\building\build_main.py:227: DeprecationWarning: `torch.distributed._sharding_spec` will be deprecated, use `torch.distributed._shard.sharding_spec` instead
+  __import__(package)
+D:\Github\Traffic-Vehicle-Monitoring-System\venv\Lib\site-packages\PyInstaller\building\build_main.py:227: DeprecationWarning: `torch.distributed._sharded_tensor` will be deprecated, use `torch.distributed._shard.sharded_tensor` instead
+  __import__(package)
+D:\Github\Traffic-Vehicle-Monitoring-System\venv\Lib\site-packages\PyInstaller\building\build_main.py:227: DeprecationWarning: `torch.distributed._shard.checkpoint` will be deprecated, use `torch.distributed.checkpoint` instead
+  __import__(package)
+pygame 2.6.1 (SDL 2.28.4, Python 3.12.10)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+129282 INFO: Extra DLL search directories (AddDllDirectory): ['D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\torch\\lib', 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\numpy.libs', 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\pandas.libs', 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\scipy.libs', 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\torchvision', 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\torchvision', 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\cv2\\../../x64/vc17/bin', 'D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\pygame']
+129282 INFO: Extra DLL search directories (PATH): ['D:\\Github\\Traffic-Vehicle-Monitoring-System\\venv\\Lib\\site-packages\\cv2\\../../x64/vc17/bin']
+132005 INFO: Warnings written to D:\Github\Traffic-Vehicle-Monitoring-System\build\car\warn-car.txt
+132437 INFO: Graph cross-reference written to D:\Github\Traffic-Vehicle-Monitoring-System\build\car\xref-car.html
+132682 INFO: checking PYZ
+132769 INFO: Building because D:\Github\Traffic-Vehicle-Monitoring-System\scripts\option_3\simulation_client.py changed
+132769 INFO: Building PYZ (ZlibArchive) D:\Github\Traffic-Vehicle-Monitoring-System\build\car\PYZ-00.pyz
+136618 INFO: Building PYZ (ZlibArchive) D:\Github\Traffic-Vehicle-Monitoring-System\build\car\PYZ-00.pyz completed successfully.
+136900 INFO: checking PKG
+137018 INFO: Building because toc changed
+137018 INFO: Building PKG (CArchive) car.pkg
+196538 INFO: Building PKG (CArchive) car.pkg completed successfully.
+196679 INFO: Bootloader D:\Github\Traffic-Vehicle-Monitoring-System\venv\Lib\site-packages\PyInstaller\bootloader\Windows-64bit-intel\runw.exe
+196679 INFO: checking EXE
+196817 INFO: Building because toc changed
+196818 INFO: Building EXE from EXE-00.toc
+196818 INFO: Copying bootloader EXE to D:\Github\Traffic-Vehicle-Monitoring-System\assets\export\car.exe
+196822 INFO: Copying icon to EXE
+196825 INFO: Copying 0 resources to EXE
+196825 INFO: Embedding manifest in EXE
+196869 INFO: Appending PKG archive to EXE
+197028 INFO: Fixing EXE headers
+211351 INFO: Building EXE from EXE-00.toc completed successfully.
+211490 INFO: Build complete! The results are available in: D:\Github\Traffic-Vehicle-Monitoring-System\assets\export
+pygame 2.6.1 (SDL 2.28.4, Python 3.12.10)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+=========================================================
+             COMPILING MAIN APPLICATION TO EXE           
+=========================================================
+[INFO] Working directory set to: D:\Github\Traffic-Vehicle-Monitoring-System
+[INFO] PyInstaller is already installed.
+
+[EXEC] Running command:
+D:\Github\Traffic-Vehicle-Monitoring-System\venv\Scripts\python.exe -m PyInstaller --onefile --windowed --name=car --icon=D:\Github\Traffic-Vehicle-Monitoring-System\assets\icon\car.ico --distpath=D:\Github\Traffic-Vehicle-Monitoring-System\assets\export --workpath=build --specpath=. --collect-all=ultralytics --hidden-import=scripts.option_3.simulation_client --add-data=D:\Github\Traffic-Vehicle-Monitoring-System\assets\icon;assets/icon --add-data=D:\Github\Traffic-Vehicle-Monitoring-System\assets\gif;assets/gif --add-data=D:\Github\Traffic-Vehicle-Monitoring-System\assets\training\traffic_dataset\model\accident_detector.pt;assets/training/traffic_dataset/model --add-data=D:\Github\Traffic-Vehicle-Monitoring-System\assets\training\traffic_dataset\model\severity_detector.pt;assets/training/traffic_dataset/model --add-data=D:\Github\Traffic-Vehicle-Monitoring-System\assets\training\simulation_dataset\simulation_detector.pt;assets/training/simulation_dataset --add-data=D:\Github\Traffic-Vehicle-Monitoring-System\assets\training\simulation_dataset\simulation_accident_detector.pt;assets/training/simulation_dataset --add-data=D:\Github\Traffic-Vehicle-Monitoring-System\config.json;. main.py
+
+
+=========================================================
+ SUCCESS: Compiling finished successfully!
+ Executable 'car.exe' is available in the 'assets/export' folder.
+=========================================================

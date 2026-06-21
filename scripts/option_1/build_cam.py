@@ -24,12 +24,14 @@ def main():
     # 3. Define pyinstaller command arguments
     # We build a single file executable named 'cam' and place it in the assets/export directory.
     script_path = "camera_streamer.py"
-    dist_path = os.path.abspath(os.path.join(current_dir, "..", "..", "assets", "export"))
-    
+    dist_path = os.path.abspath(os.path.join(current_dir, "..", "..", "assets", "export", "Cam"))
+    icon_path = os.path.abspath(os.path.join(current_dir, "..", "..", "assets", "icon", "cam.ico"))
+
     cmd = [
         sys.executable, "-m", "PyInstaller",
         "--onefile",
         "--name=cam",
+        f"--icon={icon_path}",
         f"--distpath={dist_path}",
         "--workpath=build",
         "--specpath=.",
@@ -43,7 +45,7 @@ def main():
         subprocess.check_call(cmd)
         print("\n=========================================================")
         print(" SUCCESS: Compiling finished successfully!")
-        print(" Executable 'cam.exe' is available in the 'assets/export' folder.")
+        print(f" Executable 'cam.exe' is available in '{dist_path}'.")
         print("=========================================================")
     except subprocess.CalledProcessError as e:
         print(f"\n[CRITICAL] Compilation failed with error code: {e.returncode}")

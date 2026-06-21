@@ -1,5 +1,6 @@
 import os
 import sys
+import math
 import pygame
 import tkinter as tk
 from tkinter import filedialog
@@ -10,15 +11,19 @@ import time
 import cv2
 import numpy as np
 import video_analyzer as va_module
+import webbrowser
 
 # Import modular components
 import config
+from resource_path import resource_path
 from ui_widgets import (
-    COLOR_BG, COLOR_GRID, COLOR_CYAN, COLOR_MAGENTA, COLOR_GREEN, 
-    COLOR_YELLOW, COLOR_WHITE, COLOR_MUTED, COLOR_CARD, Button, GearButton, 
+    COLOR_BG, COLOR_GRID, COLOR_CYAN, COLOR_MAGENTA, COLOR_GREEN,
+    COLOR_YELLOW, COLOR_WHITE, COLOR_MUTED, COLOR_CARD, Button, GearButton,
     draw_cyber_rect, draw_pixel_frame
 )
 from preview import SimulationPreview
+
+CARLA_DOWNLOAD_URL = "https://carla.org/2025/09/16/release-0.9.16/"
 
 # Initialize Tkinter root and hide it (for file dialogs)
 try:
@@ -31,7 +36,15 @@ class Application:
     def __init__(self):
         pygame.init()
         pygame.display.set_caption("TRAFFIC VEHICLE MONITORING SYSTEM")
-        
+
+        # Window/taskbar icon (separate from the .exe file icon, which
+        # PyInstaller embeds at build time via build_car.py --icon)
+        try:
+            icon_surf = pygame.image.load(resource_path("assets", "icon", "car_ico.png"))
+            pygame.display.set_icon(icon_surf)
+        except Exception as e:
+            print(f"[WARN] Could not load window icon: {e}")
+
         self.screen_width = 1280
         self.screen_height = 720
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
@@ -69,6 +82,22 @@ class Application:
         self.va_shutdown     = None
         self.va_thread       = None
         self.va_scrubbing    = False
+
+        # CARLA Simulation (Option 3) variables
+        self.sim_client = None
+        self.sim_latest_bgr = None
+        self.sim_stats = {}
+        self.sim_status = "DISCONNECTED"
+        self.sim_logs = []
+        self.sim_lock = threading.Lock()
+        self.sim_accident_active = False
+
+        # Screen recording — shared across all 3 monitoring options
+        self.recording        = False
+        self.record_writer    = None
+        self.record_path      = None
+        self.record_start_time = 0.0
+        self.record_last_write = 0.0
 
     def setup_fonts(self):
         """Sets up scalable system fonts with retro/cyber fallbacks."""
@@ -115,16 +144,31 @@ class Application:
             # Row 2 (Option 3, centered)
             Button((450, 476, 380, 46), "LAUNCH CARLA SIMULATION", self.action_carla_simulation, COLOR_GREEN, COLOR_MAGENTA)
         ]
+        # Shown below the CARLA button only when CARLA isn't installed/configured
+        self.download_carla_btn = Button((520, 552, 240, 38), "DOWNLOAD CARLA", self.action_download_carla, COLOR_MAGENTA, COLOR_YELLOW)
 
         # 4. LIVE MONITORING WIDGETS
         self.cam_feed_rect = pygame.Rect(40, 100, 720, 480)
         self.cam_telemetry_rect = pygame.Rect(780, 100, 460, 480)
-        self.cam_back_btn = Button((780, 600, 140, 46), "< BACK", self.stop_live_stream, COLOR_MUTED, COLOR_CYAN)
+        self.cam_back_btn = Button((40, 600, 140, 46), "< BACK", self.stop_live_stream, COLOR_MUTED, COLOR_CYAN)
+        self.cam_record_btn = Button((190, 600, 180, 46), "● RECORD", None, COLOR_MUTED, COLOR_MAGENTA)
+        self.cam_record_btn.action = lambda: self.toggle_recording("live_stream", self.cam_record_btn)
         self.cam_discover_btn = Button((935, 600, 170, 46), "AUTO-DETECT", self.trigger_auto_detect, COLOR_YELLOW, COLOR_CYAN)
         self.cam_reconnect_btn = Button((1120, 600, 120, 46), "RECONNECT", self.reconnect_live_stream, COLOR_GREEN, COLOR_CYAN)
 
         # Preview module placed above options (Y=86 to Y=386)
         self.preview_module = SimulationPreview((374, 86, 533, 300))
+
+        # Decorative hovering car art — main menu only
+        self.hover_car_img = None
+        try:
+            raw = pygame.image.load(resource_path("assets", "menu", "hover_car_pixel.png")).convert_alpha()
+            target_w = 230
+            target_h = int(target_w * raw.get_height() / raw.get_width())
+            self.hover_car_img = pygame.transform.scale(raw, (target_w, target_h))
+            self.hover_car_rect = self.hover_car_img.get_rect(center=(self.screen_width // 2, 95))
+        except Exception as e:
+            print(f"[WARN] Could not load hover car art: {e}")
 
         # 5. VIDEO ANALYSIS WIDGETS
         # Layout: video feed (800x450) left | analytics panel (430px) right
@@ -132,8 +176,18 @@ class Application:
         self.va_feed_rect     = pygame.Rect(20,  52, 800, 450)
         self.va_panel_rect    = pygame.Rect(830, 52, 430, 510)
         self.va_timeline_rect = pygame.Rect(20, 510, 800,  22)
-        self.va_back_btn  = Button((20,  556, 150, 40), "< BACK",    self.stop_video_analysis,  COLOR_MUTED,    COLOR_CYAN)
-        self.va_pause_btn = Button((185, 556, 180, 40), "|| PAUSE",  self.toggle_video_pause,   COLOR_YELLOW,   COLOR_CYAN)
+        self.va_back_btn  = Button((20,  556, 130, 40), "< BACK",    self.stop_video_analysis,  COLOR_MUTED,    COLOR_CYAN)
+        self.va_pause_btn = Button((160, 556, 150, 40), "|| PAUSE",  self.toggle_video_pause,   COLOR_YELLOW,   COLOR_CYAN)
+        self.va_record_btn = Button((320, 556, 160, 40), "● RECORD", None, COLOR_MUTED, COLOR_MAGENTA)
+        self.va_record_btn.action = lambda: self.toggle_recording("video_analysis", self.va_record_btn)
+
+        # 6. CARLA SIMULATION WIDGETS
+        self.sim_feed_rect  = pygame.Rect(20,  52, 800, 450)
+        self.sim_panel_rect = pygame.Rect(830, 52, 430, 510)
+        self.sim_back_btn   = Button((20,  556, 150, 40), "< BACK",    self.stop_carla_simulation, COLOR_MUTED,    COLOR_CYAN)
+        self.sim_accident_btn = Button((185, 556, 220, 40), "ACCIDENT: OFF", self.toggle_sim_accident, COLOR_MUTED, COLOR_MAGENTA)
+        self.sim_record_btn = Button((415, 556, 170, 40), "● RECORD", None, COLOR_MUTED, COLOR_MAGENTA)
+        self.sim_record_btn.action = lambda: self.toggle_recording("simulation", self.sim_record_btn)
 
     def go_to_main_menu(self):
         self.state = "MAIN_MENU"
@@ -151,7 +205,73 @@ class Application:
         # Gracefully stop stream if running before exit
         if hasattr(self, 'stream_shutdown'):
             self.stream_shutdown.set()
+        if hasattr(self, 'sim_client') and self.sim_client:
+            self.sim_client.stop()
+        self.stop_recording()
         self.running = False
+
+    # ── Screen recording (shared by all 3 monitoring options) ──────────────────
+
+    def start_recording(self, tag):
+        if self.recording:
+            return
+        import datetime
+        out_dir = "recordings"
+        os.makedirs(out_dir, exist_ok=True)
+        stamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        self.record_path = os.path.join(out_dir, f"{tag}_{stamp}.mp4")
+
+        fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+        self.record_writer = cv2.VideoWriter(
+            self.record_path, fourcc, 20.0, (self.screen_width, self.screen_height)
+        )
+        if not self.record_writer.isOpened():
+            print(f"[RECORD] Failed to open writer for {self.record_path}")
+            self.record_writer = None
+            return
+
+        self.recording        = True
+        self.record_start_time = time.time()
+        self.record_last_write = 0.0
+        print(f"[RECORD] Started → {self.record_path}")
+
+    def stop_recording(self):
+        if not self.recording:
+            return
+        self.recording = False
+        if self.record_writer:
+            self.record_writer.release()
+            self.record_writer = None
+        print(f"[RECORD] Saved → {self.record_path}")
+
+    def toggle_recording(self, tag, button):
+        if self.recording:
+            self.stop_recording()
+        else:
+            self.start_recording(tag)
+        button.text = "■ STOP REC" if self.recording else "● RECORD"
+        button.color = COLOR_MAGENTA if self.recording else COLOR_MUTED
+        button.accent_color = COLOR_CYAN if self.recording else COLOR_MAGENTA
+
+    def _capture_record_frame(self):
+        if not self.recording or not self.record_writer:
+            return
+        now = time.time()
+        if now - self.record_last_write < (1.0 / 20.0):
+            return
+        self.record_last_write = now
+        frame_arr = pygame.surfarray.array3d(self.screen)   # (W, H, 3) RGB
+        frame_arr = frame_arr.transpose([1, 0, 2])            # (H, W, 3)
+        frame_bgr = cv2.cvtColor(frame_arr, cv2.COLOR_RGB2BGR)
+        self.record_writer.write(frame_bgr)
+
+    def _draw_recording_indicator(self):
+        elapsed = time.time() - self.record_start_time
+        mins, secs = int(elapsed) // 60, int(elapsed) % 60
+        if int(time.time() * 2) % 2 == 0:
+            pygame.draw.circle(self.screen, COLOR_MAGENTA, (self.screen_width - 112, 16), 7)
+        rec_text = self.font_body.render(f"REC {mins:02d}:{secs:02d}", True, COLOR_MAGENTA)
+        self.screen.blit(rec_text, (self.screen_width - 96, 6))
 
     def browse_carla_path(self):
         if tk_root:
@@ -331,6 +451,8 @@ class Application:
         if hasattr(self, 'stream_thread') and self.stream_thread.is_alive():
             self.stream_thread.join(timeout=0.5)
         self.stream_frame = None
+        if self.recording:
+            self.toggle_recording("live_stream", self.cam_record_btn)
         self.state = "OPTIONS"
 
     def reconnect_live_stream(self):
@@ -480,6 +602,10 @@ class Application:
             else:
                 print("[~] No trained accident_detector.pt — run train.py first.")
 
+        # Clear vehicle-tracking state so the previous video's motion
+        # history doesn't bleed into this one
+        self.video_analyzer.reset()
+
         self.va_pause_btn.text = "|| PAUSE"
         self.va_shutdown = threading.Event()
         self.va_thread   = threading.Thread(target=self._va_proc_loop, daemon=True)
@@ -495,6 +621,8 @@ class Application:
             self.va_cap.release()
         with self.va_lock:
             self.va_latest_bgr = None
+        if self.recording:
+            self.toggle_recording("video_analysis", self.va_record_btn)
         self.state = "OPTIONS"
 
     def toggle_video_pause(self):
@@ -520,6 +648,12 @@ class Application:
                 self.va_seek_to = None
                 self.va_ended   = False
                 clf_counter     = 0
+                # Jumping to an arbitrary point invalidates the tracker's
+                # motion history — without this, stale pre-seek positions get
+                # compared against the new frame, producing bogus "abrupt
+                # stop" detections tied to a different point in the video,
+                # and can misattribute the accident box to the wrong vehicle
+                self.video_analyzer.reset()
                 if self.va_paused:
                     # Render just this one seeked frame so the display updates
                     ret, frame = self.va_cap.read()
@@ -575,6 +709,12 @@ class Application:
             if slack > 0:
                 time.sleep(slack)
 
+    def is_carla_installed(self):
+        carla_dir = self.config_data.get("carla_path", "")
+        if not carla_dir or not os.path.isdir(carla_dir):
+            return False
+        return os.path.exists(os.path.join(carla_dir, "CarlaUE4.exe"))
+
     def action_carla_simulation(self):
         print("[ACTION] Launching CARLA Simulation process...")
         carla_dir = self.config_data.get("carla_path", "")
@@ -583,6 +723,79 @@ class Application:
             self.go_to_settings()
         else:
             print(f"[ACTION] Found valid CARLA directory: {carla_dir}")
+            self.start_carla_simulation()
+
+    def action_download_carla(self):
+        print(f"[ACTION] Opening CARLA download page: {CARLA_DOWNLOAD_URL}")
+        webbrowser.open(CARLA_DOWNLOAD_URL)
+
+    def log_sim(self, message):
+        timestamp = pygame.time.get_ticks() / 1000.0
+        log_entry = f"[{timestamp:.1f}s] {message}"
+        if not hasattr(self, 'sim_logs'):
+            self.sim_logs = []
+        self.sim_logs.append(log_entry)
+        if len(self.sim_logs) > 6:
+            self.sim_logs.pop(0)
+        print(message)
+
+    def on_sim_frame(self, bgr, stats):
+        with self.sim_lock:
+            self.sim_latest_bgr = bgr.copy()
+            self.sim_stats = stats
+            self.sim_status = "CONNECTED"
+
+    def start_carla_simulation(self):
+        self.state = "CARLA_SIMULATION"
+        self.sim_latest_bgr = None
+        self.sim_stats = {}
+        self.sim_status = "CONNECTING"
+        self.sim_logs = []
+        self.sim_accident_active = False
+        self.sim_accident_btn.text = "ACCIDENT: OFF"
+        self.sim_accident_btn.color = COLOR_MUTED
+        self.sim_accident_btn.accent_color = COLOR_MAGENTA
+        
+        self.log_sim("Initializing CARLA client...")
+        
+        try:
+            from scripts.option_3.simulation_client import CARLASimulationClient
+            
+            carla_dir = self.config_data.get("carla_path", "")
+            model_path = resource_path("assets", "training", "simulation_dataset", "simulation_detector.pt")
+            
+            self.sim_client = CARLASimulationClient(
+                carla_path=carla_dir,
+                model_path=model_path,
+                on_frame_callback=self.on_sim_frame,
+                log_callback=self.log_sim
+            )
+            self.sim_client.start()
+        except Exception as e:
+            self.log_sim(f"Error starting simulation: {e}")
+            self.sim_status = "ERROR"
+
+    def stop_carla_simulation(self):
+        self.log_sim("Shutting down CARLA client thread...")
+        self.sim_accident_active = False
+        if self.sim_client:
+            self.sim_client.stop()
+            self.sim_client = None
+        if self.recording:
+            self.toggle_recording("simulation", self.sim_record_btn)
+        self.state = "OPTIONS"
+
+    def trigger_sim_spawn(self):
+        if self.sim_client:
+            self.sim_client.spawn_additional_traffic(15)
+
+    def toggle_sim_accident(self):
+        if self.sim_client:
+            self.sim_accident_active = not self.sim_accident_active
+            self.sim_client.toggle_accident(self.sim_accident_active)
+            self.sim_accident_btn.text = "ACCIDENT: ON" if self.sim_accident_active else "ACCIDENT: OFF"
+            self.sim_accident_btn.color = COLOR_MAGENTA if self.sim_accident_active else COLOR_MUTED
+            self.sim_accident_btn.accent_color = COLOR_CYAN if self.sim_accident_active else COLOR_MAGENTA
 
     def update(self):
         mouse_pos = pygame.mouse.get_pos()
@@ -601,30 +814,38 @@ class Application:
             self.opt_back_btn.update(mouse_pos)
             for btn in self.option_buttons:
                 btn.update(mouse_pos)
+            if not self.is_carla_installed():
+                self.download_carla_btn.update(mouse_pos)
 
             # Determine which GIF to display in the preview module
             # Default is 1.gif
-            target_gif = "assets/gif/1.gif"
-            
+            target_gif = resource_path("assets", "gif", "1.gif")
+
             # Hover over Button 1 (Connect Live Camera) -> 1.gif
             if self.option_buttons[0].hovered:
-                target_gif = "assets/gif/1.gif"
+                target_gif = resource_path("assets", "gif", "1.gif")
             # Hover over Button 2 (Process Video) -> 2.gif
             elif self.option_buttons[1].hovered:
-                target_gif = "assets/gif/2.gif"
+                target_gif = resource_path("assets", "gif", "2.gif")
             # Hover over Button 3 (CARLA Simulation) -> 3.gif
             elif self.option_buttons[2].hovered:
-                target_gif = "assets/gif/3.gif"
+                target_gif = resource_path("assets", "gif", "3.gif")
                 
             self.preview_module.set_active_gif(target_gif)
             self.preview_module.update()
         elif self.state == "LIVE_STREAM":
             self.cam_back_btn.update(mouse_pos)
+            self.cam_record_btn.update(mouse_pos)
             self.cam_discover_btn.update(mouse_pos)
             self.cam_reconnect_btn.update(mouse_pos)
         elif self.state == "VIDEO_ANALYSIS":
             self.va_back_btn.update(mouse_pos)
             self.va_pause_btn.update(mouse_pos)
+            self.va_record_btn.update(mouse_pos)
+        elif self.state == "CARLA_SIMULATION":
+            self.sim_back_btn.update(mouse_pos)
+            self.sim_accident_btn.update(mouse_pos)
+            self.sim_record_btn.update(mouse_pos)
 
     def draw_background(self):
         self.screen.fill(COLOR_BG)
@@ -655,14 +876,178 @@ class Application:
             self.draw_live_stream()
         elif self.state == "VIDEO_ANALYSIS":
             self.draw_video_analysis()
+        elif self.state == "CARLA_SIMULATION":
+            self.draw_carla_simulation()
 
         if self.state in ["MAIN_MENU", "OPTIONS"]:
             self.gear_button.draw(self.screen)
 
+        if self.recording and self.state in ["LIVE_STREAM", "VIDEO_ANALYSIS", "CARLA_SIMULATION"]:
+            self._draw_recording_indicator()
+
         self.draw_scanlines()
+        self._capture_record_frame()
         pygame.display.flip()
 
+    def draw_carla_simulation(self):
+        with self.sim_lock:
+            bgr = self.sim_latest_bgr
+            stats = dict(self.sim_stats)
+        status = self.sim_status
+        
+        # ── Title ────────────────────────────────────────────────────────────
+        title_surf = self.font_header.render("MONITORING PROTOCOL: CARLA SIMULATION", True, COLOR_CYAN)
+        self.screen.blit(title_surf, (20, 14))
+
+        # ── Video feed area ───────────────────────────────────────────────────
+        pygame.draw.rect(self.screen, COLOR_CARD, self.sim_feed_rect)
+
+        if bgr is not None:
+            fw, fh = self.sim_feed_rect.width, self.sim_feed_rect.height
+            resized = cv2.resize(bgr, (fw, fh))
+            rgb_arr = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
+            frame_surf = pygame.surfarray.make_surface(rgb_arr.swapaxes(0, 1))
+            self.screen.blit(frame_surf, self.sim_feed_rect.topleft)
+        else:
+            # Loading placeholder
+            status_desc = "ESTABLISHING TCP HANDSHAKE..."
+            if status == "CONNECTING":
+                status_desc = "CONNECTING TO CARLA SERVER..."
+            elif status == "ERROR":
+                status_desc = "CONNECTION ERROR - CHECK SETTINGS"
+            loading_surf = self.font_header.render(status_desc, True, COLOR_MAGENTA)
+            self.screen.blit(loading_surf, loading_surf.get_rect(center=self.sim_feed_rect.center))
+
+        draw_pixel_frame(self.screen, self.sim_feed_rect, COLOR_CYAN, COLOR_GREEN)
+
+        # Custom/Fallback model info tag top-left of feed
+        is_fallback = stats.get("fallback", True)
+        model_name = "COCO PRETRAINED (FALLBACK)" if is_fallback else "CUSTOM SIMULATION MODEL"
+        model_color = COLOR_YELLOW if is_fallback else COLOR_GREEN
+        model_tag = self.font_sm.render(f"MODEL: {model_name}", True, model_color)
+        self.screen.blit(model_tag, (self.sim_feed_rect.x + 10, self.sim_feed_rect.y + 8))
+
+        # Flashing Live Indicator
+        if pygame.time.get_ticks() % 1000 < 500:
+            rec_color = COLOR_MAGENTA if status == "CONNECTED" else COLOR_MUTED
+            pygame.draw.circle(self.screen, rec_color, (self.sim_feed_rect.right - 90, self.sim_feed_rect.top + 20), 6)
+            rec_text = self.font_body.render("SIM ACTIVE", True, rec_color)
+            self.screen.blit(rec_text, (self.sim_feed_rect.right - 80, self.sim_feed_rect.top + 10))
+
+        # Flashing Critical Alert HUD overlay if any accident detected
+        any_accident = any(j.get("accident", False) for j in stats.get("junctions", []))
+        if any_accident and (pygame.time.get_ticks() % 600 < 300):
+            alert_badge = self.font_body.render("CRITICAL ALERT", True, COLOR_MAGENTA)
+            self.screen.blit(alert_badge, (self.sim_feed_rect.right - 240, self.sim_feed_rect.top + 10))
+
+        # ── Analytics & Terminal panel ─────────────────────────────────────────
+        self._draw_sim_panel(stats, status)
+
+        # ── Buttons ───────────────────────────────────────────────────────────
+        self.sim_back_btn.draw(self.screen, self.font_body)
+        self.sim_accident_btn.draw(self.screen, self.font_body)
+        self.sim_record_btn.draw(self.screen, self.font_body)
+
+    def _draw_sim_panel(self, stats, status):
+        px, py = self.sim_panel_rect.x, self.sim_panel_rect.y
+        pw     = self.sim_panel_rect.width
+        ph     = self.sim_panel_rect.height
+
+        draw_cyber_rect(self.screen, COLOR_MUTED, self.sim_panel_rect, cut_size=14, thickness=2)
+
+        # Header
+        hdr = self.font_header.render("TELEMETRY & CONTROL", True, COLOR_CYAN)
+        self.screen.blit(hdr, (px + 20, py + 16))
+        
+        # Check if any junction has an accident for global panel alert
+        junctions = stats.get("junctions", [])
+        any_accident = any(j.get("accident", False) for j in junctions)
+        if any_accident and (pygame.time.get_ticks() % 600 < 300):
+            alert_surf = self.font_body.render("[!!] ALARM", True, COLOR_MAGENTA)
+            self.screen.blit(alert_surf, (px + pw - 120, py + 22))
+            
+        pygame.draw.line(self.screen, COLOR_MUTED, (px + 10, py + 46), (px + pw - 10, py + 46), 1)
+
+        lx   = px + 20
+        cy   = py + 58
+        rh   = 24       # row height
+        vcol = lx + 160 # value column x
+
+        def row(label, value, color=COLOR_WHITE):
+            nonlocal cy
+            self.screen.blit(self.font_body.render(label, True, COLOR_MUTED), (lx, cy))
+            self.screen.blit(self.font_body.render(str(value), True, color),  (vcol, cy))
+            cy += rh
+
+        # Status
+        led_color = COLOR_GREEN if status == "CONNECTED" else COLOR_MAGENTA
+        pygame.draw.circle(self.screen, led_color, (lx + 8, cy + 10), 6)
+        self.screen.blit(self.font_body.render("CARLA ENGINE", True, COLOR_MUTED), (lx + 24, cy))
+        self.screen.blit(self.font_body.render(status, True, led_color), (vcol, cy))
+        cy += rh
+
+        # Junction Breakdown Section
+        cy += 4
+        self.screen.blit(self.font_sm.render("JUNCTION TRAFFIC BREAKDOWN", True, COLOR_MUTED), (lx, cy))
+        cy += 14
+        
+        junctions = stats.get("junctions", [])
+        for i, name in enumerate(["ALPHA (CAM 1)", "BETA  (CAM 2)", "GAMMA (CAM 3)", "DELTA (CAM 4)"]):
+            total_j = 0
+            has_accident = False
+            if i < len(junctions):
+                total_j = sum(v for k, v in junctions[i].items() if k not in ["Person", "accident"])
+                has_accident = junctions[i].get("accident", False)
+                
+            self.screen.blit(self.font_body.render(f"JNC {name}", True, COLOR_MUTED), (lx, cy))
+            
+            val_color = COLOR_CYAN if total_j > 0 else COLOR_MUTED
+            if has_accident:
+                val_color = COLOR_MAGENTA
+            self.screen.blit(self.font_body.render(str(total_j), True, val_color), (vcol, cy))
+            
+            if has_accident:
+                tick = pygame.time.get_ticks()
+                if tick % 600 < 300:
+                    alert_lbl = self.font_sm.render("[!!] ACCIDENT [!!]", True, COLOR_MAGENTA)
+                    self.screen.blit(alert_lbl, (vcol + 45, cy + 4))
+            cy += rh
+
+        # Global Statistics Section
+        cy += 4
+        self.screen.blit(self.font_sm.render("GLOBAL TRACKED STATS", True, COLOR_MUTED), (lx, cy))
+        cy += 14
+
+        counts = stats.get("counts", {})
+        for lbl in ("Car", "Truck", "Bus", "Motorcycle"):
+            n = counts.get(lbl, 0)
+            row(lbl.upper(), n, COLOR_CYAN if n > 0 else COLOR_MUTED)
+
+        accident_count = stats.get("accident_count", 0)
+        row("ACCIDENT COUNT", accident_count, COLOR_MAGENTA if accident_count > 0 else COLOR_MUTED)
+        
+        # Logs/Terminal Panel inside dashboard
+        pygame.draw.line(self.screen, (55, 22, 75), (lx, cy), (px + pw - 10, cy), 1)
+        cy += 8
+        self.screen.blit(self.font_sm.render("SIMULATION LOGS", True, COLOR_MUTED), (lx, cy))
+        cy += 14
+        
+        log_panel_rect = pygame.Rect(lx, cy, pw - 40, ph - (cy - py) - 20)
+        draw_cyber_rect(self.screen, COLOR_GRID, log_panel_rect, cut_size=8, thickness=1, fill=True)
+        pygame.draw.rect(self.screen, COLOR_MUTED, log_panel_rect, 1)
+        
+        log_y = log_panel_rect.top + 8
+        for log in self.sim_logs:
+            log_surf = self.font_sm.render(log, True, COLOR_GREEN)
+            self.screen.blit(log_surf, (log_panel_rect.left + 10, log_y))
+            log_y += 15
+
     def draw_main_menu(self):
+        if self.hover_car_img:
+            bob = int(8 * math.sin(pygame.time.get_ticks() / 450.0))
+            pos = self.hover_car_rect.move(0, bob)
+            self.screen.blit(self.hover_car_img, pos)
+
         title = "TRAFFIC VEHICLE MONITORING SYSTEM"
         title_shadow = self.font_title.render(title, True, COLOR_MAGENTA)
         title_text = self.font_title.render(title, True, COLOR_WHITE)
@@ -733,6 +1118,11 @@ class Application:
             btn.draw(self.screen, self.font_body)
 
         self.preview_module.draw(self.screen, self.font_sm)
+
+        if not self.is_carla_installed():
+            warn_surf = self.font_body.render("⚠ CARLA NOT DOWNLOADED", True, COLOR_MAGENTA)
+            self.screen.blit(warn_surf, warn_surf.get_rect(center=(self.screen_width // 2, 534)))
+            self.download_carla_btn.draw(self.screen, self.font_sm)
 
     def draw_live_stream(self):
         # 1. Main Titles
@@ -837,6 +1227,7 @@ class Application:
 
         # 5. Draw Buttons
         self.cam_back_btn.draw(self.screen, self.font_body)
+        self.cam_record_btn.draw(self.screen, self.font_body)
         self.cam_discover_btn.draw(self.screen, self.font_body)
         self.cam_reconnect_btn.draw(self.screen, self.font_body)
 
@@ -917,11 +1308,12 @@ class Application:
             f"     FRAME {pos} / {total}"
         )
         ts_surf = self.font_body.render(ts_str, True, COLOR_WHITE)
-        self.screen.blit(ts_surf, (380, 566))
+        self.screen.blit(ts_surf, (500, 566))
 
         # ── Buttons ───────────────────────────────────────────────────────────
         self.va_back_btn.draw(self.screen,  self.font_body)
         self.va_pause_btn.draw(self.screen, self.font_body)
+        self.va_record_btn.draw(self.screen, self.font_body)
 
     def _draw_va_analytics(self, stats):
         px, py = self.va_panel_rect.x, self.va_panel_rect.y
@@ -1075,11 +1467,15 @@ class Application:
             elif self.state == "OPTIONS":
                 if self.opt_back_btn.handle_event(event):
                     continue
+                if not self.is_carla_installed() and self.download_carla_btn.handle_event(event):
+                    continue
                 for btn in self.option_buttons:
                     if btn.handle_event(event):
                         break
             elif self.state == "LIVE_STREAM":
                 if self.cam_back_btn.handle_event(event):
+                    continue
+                if self.cam_record_btn.handle_event(event):
                     continue
                 if self.cam_discover_btn.handle_event(event):
                     continue
@@ -1113,6 +1509,15 @@ class Application:
                 if self.va_back_btn.handle_event(event):
                     continue
                 if self.va_pause_btn.handle_event(event):
+                    continue
+                if self.va_record_btn.handle_event(event):
+                    continue
+            elif self.state == "CARLA_SIMULATION":
+                if self.sim_back_btn.handle_event(event):
+                    continue
+                if self.sim_accident_btn.handle_event(event):
+                    continue
+                if self.sim_record_btn.handle_event(event):
                     continue
 
     def run(self):

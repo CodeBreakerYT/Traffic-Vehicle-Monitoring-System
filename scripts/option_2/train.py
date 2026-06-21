@@ -94,7 +94,7 @@ def build_clf_dataset(
 # 1. Accident / Non-Accident classifier
 # ─────────────────────────────────────────────────────────────────────────────
 
-def train_accident_model(epochs: int = 50, imgsz: int = 224, batch: int = 32) -> Path:
+def train_accident_model(epochs: int = 25, imgsz: int = 224, batch: int = 32) -> Path:
     from ultralytics import YOLO
 
     print("\n" + "=" * 58)
@@ -104,6 +104,14 @@ def train_accident_model(epochs: int = 50, imgsz: int = 224, batch: int = 32) ->
     print("  Source  : Accident/ & NonAccident/ folders")
     print("=" * 58)
 
+    # Balance classes — source has 6,191 accident vs 15,420 nonaccident (2.5x
+    # skew). An imbalanced binary classifier biases toward the majority class
+    # (nonaccident), which is exactly why real accidents were being missed.
+    acc_n    = len(collect_images(ACCIDENT_SRC))
+    nonacc_n = len(collect_images(NON_ACCIDENT_SRC))
+    cap      = min(acc_n, nonacc_n)
+    print(f"  Balancing classes to {cap} images each (source: acc={acc_n}, nonacc={nonacc_n})")
+
     ds = build_clf_dataset(
         name="accident_ds",
         class_dirs={
@@ -111,6 +119,7 @@ def train_accident_model(epochs: int = 50, imgsz: int = 224, batch: int = 32) ->
             "nonaccident": NON_ACCIDENT_SRC,
         },
         val_split=0.2,
+        max_per_class=cap,
     )
 
     # yolov8s-cls is ~4× more parameters than nano — meaningfully better
@@ -225,7 +234,7 @@ def load_severity_labels() -> dict[str, int]:
     return label_map
 
 
-def train_severity_model(epochs: int = 35, imgsz: int = 224, batch: int = 16) -> Path | None:
+def train_severity_model(epochs: int = 20, imgsz: int = 224, batch: int = 16) -> Path | None:
     from ultralytics import YOLO
 
     print("\n" + "=" * 58)
