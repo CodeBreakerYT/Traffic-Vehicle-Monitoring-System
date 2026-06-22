@@ -64,6 +64,12 @@ Standalone builds live in `assets/export/`:
 ```bash
 venv\Scripts\python.exe scripts/option_2/train.py
 ```
+
+### Kaggle datasets used:
+1. https://www.kaggle.com/datasets/programmer3/smart-traffic-monitoring-dataset
+2. https://www.kaggle.com/datasets/nadinpethiyagoda/vehicle-dataset-for-yolo
+3. https://www.kaggle.com/datasets/kallagnanachandu/traffic-analysis-dataset
+
 Trains on `assets/training/traffic_dataset/training/` (Accident / NonAccident / SeverityScore folders), balancing classes automatically. Outputs to `assets/training/traffic_dataset/model/`.
 
 **Option 3 — CARLA dedicated accident detector**
