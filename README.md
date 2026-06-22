@@ -1,19 +1,27 @@
 # Traffic & Vehicle Monitoring System
+<img width="1899" height="1067" alt="Screenshot 2026-06-22 205202" src="https://github.com/user-attachments/assets/902ce2dc-001e-417e-b779-4bbb4c99d39f" />
 
 A traffic and vehicle monitoring system built with Python, OpenCV, YOLOv8, and CARLA — with a retro cyberpunk pygame UI. It detects vehicles, pedestrians, and accidents across three monitoring modes.
 
 ## Features
 
-**Option 1 — Live Camera Feed**
+## **Option 1 — Live Camera Feed**
+<img width="959" height="278" alt="image" src="https://github.com/user-attachments/assets/b387396a-f5ea-4adc-8994-e601b2a98ec0" />
+
 Stream video from a second laptop's camera (`cam.exe`) over the network into the main app for real-time monitoring.
 
-**Option 2 — Video Analysis**
+## **Option 2 — Video Analysis**
+<img width="1903" height="1094" alt="Screenshot 2026-06-22 205230" src="https://github.com/user-attachments/assets/3dd61eb8-668e-4380-bc94-7d95b219a1c2" />
+
 Upload a traffic video for vehicle/pedestrian detection, accident detection, and severity estimation, with playback controls (pause, seek/scrub timeline) and on-screen analytics. Accident detection combines:
 - A motion tracker that flags an abrupt, sustained stop on collision-style overlap (the primary, most reliable signal)
 - A trained scene classifier that can independently confirm an accident across sustained frames (catches footage where the crash already happened before the clip started)
 - Recording support to save the analysis session
 
-**Option 3 — CARLA Simulation**
+## **Option 3 — CARLA Simulation**
+<img width="1899" height="1113" alt="Screenshot 2026-06-22 205408" src="https://github.com/user-attachments/assets/76972a63-1c4e-4716-8e5b-a51b26f6dd43" />
+<img width="1183" height="926" alt="Screenshot 2026-06-22 205401" src="https://github.com/user-attachments/assets/85c3ed96-77a7-4b47-8baa-7ab076abb67f" />
+
 A 2×2 CCTV camera grid inside a live CARLA simulation with ~120 background vehicles on autopilot. An "Accident" toggle spawns a deliberate two-vehicle collision; detection runs via a layered combination of a motion tracker, a dedicated trained accident detector, and CARLA's own physics collision sensors as ground truth. Detection is gated behind the toggle — accidents are only ever reported while it's switched on.
 
 All three options support in-app screen recording, and the Options screen prompts to download CARLA if it isn't installed/configured yet.
